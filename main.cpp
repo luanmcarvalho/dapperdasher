@@ -4,15 +4,33 @@ int main ()
 {
     SetTargetFPS(60);
 
-    const int width = 1280;
-    const int height = 720;
+    // Window Size
+    const int windowWidth = 1280;
+    const int WindowsHeight = 720;
 
-    InitWindow(width, height, "Dapper Dasher");
+    InitWindow(windowWidth, WindowsHeight, "Dapper Dasher");
+
+    //rectangle dimensions
+    int width = 100;
+    int height = 100;
+
+    int  posY = WindowsHeight - height;
+    int vel = 0;
 
     while (!WindowShouldClose())
     {
         BeginDrawing();
         ClearBackground(RAYWHITE);
+
+          if (IsKeyPressed(KEY_SPACE))
+        {
+            // Update Velocity
+            vel -= 10;
+        }
+
+        posY += vel;
+
+        DrawRectangle(windowWidth/2, posY, width, height, BLUE);
         EndDrawing();
     }
     CloseWindow();
