@@ -25,10 +25,19 @@ int main ()
     scarfyPosition.y = WindowsHeight - Recscarfy.height;
 
     // Gravity
-    const int gravity = 1;
+    const int gravity = 1000;
 
     // Velocity
     int vel = 0;
+
+    // scarfy animation frame
+    int scarfyFrame = 0;
+
+    // Update Time
+    const float updateTime = 1.0/12.0;
+
+    // Running Time
+    float runningTime = 0;
 
     while (!WindowShouldClose())
     {
@@ -36,24 +45,41 @@ int main ()
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
+        // Delta Time
+        const float dT = GetFrameTime();
+
         // Ground check
         if (scarfyPosition.y >= WindowsHeight - Recscarfy.height)
         {
             vel = 0;
         }
-        else
-        {
-            vel += gravity;
-        }
+        else{
+                scarfyFrame = 0;
+                vel += gravity * dT * 1.5;
+            }
+
 
         // Jump
           if (IsKeyPressed(KEY_SPACE) && scarfyPosition.y >= WindowsHeight - Recscarfy.height)
         {
             // Update Velocity
-            vel -= 20;
+            vel -= 1000;
         }
 
-        scarfyPosition.y += vel;
+        scarfyPosition.y += vel * dT;
+
+        runningTime += dT;
+        if (runningTime >= updateTime)
+        {
+            runningTime = 0.0;
+            Recscarfy.x = scarfyFrame * Recscarfy.width;
+            scarfyFrame++;
+        }
+
+        if (scarfyFrame > 5)
+        {
+            scarfyFrame = 0;
+        }
 
         DrawTextureRec(scarfy, Recscarfy, scarfyPosition, WHITE);
         EndDrawing();
