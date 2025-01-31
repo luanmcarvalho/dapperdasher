@@ -1,5 +1,15 @@
 #include "raylib.h"
 
+struct animData
+{
+    int frame;
+    int updateTime;
+    int runningTime;
+    Vector2 position;
+    Rectangle rec;
+};
+
+
 int main ()
 {
     SetTargetFPS(60);
@@ -33,11 +43,33 @@ int main ()
     // scarfy animation frame
     int scarfyFrame = 0;
 
+    // nebula animation frame
+    int nebulaFrame = 0;
+
     // Update Time
     const float updateTime = 1.0/12.0;
 
     // Running Time
     float runningTime = 0;
+
+    // Nebula setup
+    Texture2D nebula = LoadTexture("textures/12_nebula_spritesheet.png");
+    Rectangle Recnebula;
+    Vector2 nebulaPosition;
+
+    // Set the dimensions of the rectangle
+    Recnebula.height = nebula.height/8;
+    Recnebula.width = nebula.width/8;
+    Recnebula.x = 0;
+    Recnebula.y = 0;
+
+    // Nebula Initial position
+    nebulaPosition.y = WindowsHeight - Recnebula.height;
+    nebulaPosition.x = windowWidth;
+
+    //nebula velocity
+    int nebulaVel = -300;
+
 
     while (!WindowShouldClose())
     {
@@ -66,25 +98,49 @@ int main ()
             vel -= 1000;
         }
 
+         // Nebula Movement
+        nebulaPosition.x += nebulaVel * dT;
+
+        //scarfy Movement
         scarfyPosition.y += vel * dT;
 
         runningTime += dT;
+
+
         if (runningTime >= updateTime)
         {
             runningTime = 0.0;
             Recscarfy.x = scarfyFrame * Recscarfy.width;
             scarfyFrame++;
+
+            if (scarfyFrame > 5)
+            {
+                scarfyFrame = 0;
+            }
+
+            Recnebula.x = nebulaFrame * Recnebula.width;
+            nebulaFrame++;
+
+            if (nebulaFrame > 7)
+            {
+                nebulaFrame = 0;
+                Recnebula.y += Recnebula.height;
+            }
+
+            if (Recnebula.y >= nebula.height)
+            {
+                Recnebula.y = 0;
+            }
+
         }
 
-        if (scarfyFrame > 5)
-        {
-            scarfyFrame = 0;
-        }
 
         DrawTextureRec(scarfy, Recscarfy, scarfyPosition, WHITE);
+        DrawTextureRec(nebula, Recnebula, nebulaPosition, WHITE);
         EndDrawing();
     }
     UnloadTexture(scarfy);
+    UnloadTexture(nebula);
     CloseWindow();
 
 }
