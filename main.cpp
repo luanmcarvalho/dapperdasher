@@ -51,17 +51,23 @@ int main ()
     // -------------------------------------------------------------
     // Nebula setup
     Texture2D nebula = LoadTexture("textures/12_nebula_spritesheet.png");
-    animData nebulaData;
 
-    // Nebula rectangle dimensions and position
-    nebulaData.rec.height = nebula.height/8;
-    nebulaData.rec.width = nebula.width/8;
-    nebulaData.rec.x = 0;
-    nebulaData.rec.y = 0;
+    const int nebulaNum {10};
+    animData nebulaE[nebulaNum]{};
 
-    // Nebula position
-    nebulaData.position.y = WindowsHeight - nebulaData.rec.height;
-    nebulaData.position.x = windowWidth;
+    for (int i = 0; i < nebulaNum; i++)
+    {
+        nebulaE[i].frame = 0;
+        nebulaE[i].updateTime = 1.0/16.0;
+        nebulaE[i].runningTime = 0;
+        nebulaE[i].rec.height = nebula.height/8;
+        nebulaE[i].rec.width = nebula.width/8;
+        nebulaE[i].rec.x = 0;
+        nebulaE[i].rec.y = 0;
+        nebulaE[i].position.y = WindowsHeight - nebulaE[i].rec.height;
+        nebulaE[i].position.x = windowWidth + i * 500;
+    }
+
 
     //nebula movement
     int nebulaVel = -300;
@@ -82,10 +88,11 @@ int main ()
         {
             vel = 0;
         }
-        else{
-                scarfyData.frame = 0;
-                vel += gravity * dT * 1.5;
-            }
+        else
+        {
+            scarfyData.frame = 0;
+            vel += gravity * dT * 1.5;
+        }
 
 
         // Jump
@@ -96,7 +103,10 @@ int main ()
         }
 
          // Nebula Movement
-        nebulaData.position.x += nebulaVel * dT;
+        for (int i = 0; i < nebulaNum; i++)
+        {
+            nebulaE[i].position.x += nebulaVel * dT;
+        }
 
         //scarfy Movement
         scarfyData.position.y += vel * dT;
@@ -114,25 +124,36 @@ int main ()
             {
                 scarfyData.frame = 0;
             }
-
-            nebulaData.rec.x = nebulaData.frame * nebulaData.rec.width;
-            nebulaData.frame++;
-
-            if (nebulaData.frame > 7)
+        }
+        // Nebula update
+        for (int i = 0; i < nebulaNum; i++)
+        {
+            nebulaE[i].runningTime += dT;
+            if (nebulaE[i].runningTime >= nebulaE[i].updateTime)
             {
-                nebulaData.frame = 0;
-                nebulaData.rec.y += nebulaData.rec.height;
-            }
+                nebulaE[i].runningTime = 0.0;
+                nebulaE[i].rec.x = nebulaE[i].frame * nebulaE[i].rec.width;
+                nebulaE[i].frame++;
 
-            if (nebulaData.rec.y >= nebula.height)
-            {
-                nebulaData.rec.y = 0;
-            }
+                if (nebulaE[i].frame > 7)
+                {
+                    nebulaE[i].frame = 0;
+                    nebulaE[i].rec.y += nebulaE[i].rec.height;
+                }
 
-        }   // End of Loop------------------------------------------------
+                if (nebulaE[i].rec.y >= nebula.height)
+                {
+                    nebulaE[i].rec.y = 0;
+                }
+            }
+        }
+        // End of Loop------------------------------------------------
 
         // Draw
-        DrawTextureRec(nebula, nebulaData.rec, nebulaData.position, WHITE);
+        for (int i = 0; i < nebulaNum; i++)
+        {
+            DrawTextureRec(nebula, nebulaE[i].rec, nebulaE[i].position, WHITE);
+        }
         DrawTextureRec(scarfy, scarfyData.rec, scarfyData.position, WHITE);
         EndDrawing();
     }
